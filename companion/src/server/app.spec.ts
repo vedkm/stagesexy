@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -27,6 +28,43 @@ afterEach(async () => {
 });
 
 describe("buildCompanionApp", () => {
+  it("resolves the snapshot label from an alias written through the public command", async () => {
+    const aliasFilePath = await createAliasFile([]);
+
+    await expect(
+      runAliasSetCommand({
+        aliasFilePath,
+        layerKey: "main-selector:1",
+        stageLabel: "Piano Intro",
+      }),
+    ).resolves.toContain("Saved stage label");
+
+    const app = await buildCompanionApp({
+      aliasFilePath,
+      now: () => new Date("2026-03-07T12:00:00.000Z"),
+    });
+
+    try {
+      await app.inject({
+        method: "POST",
+        url: "/ingest",
+        payload: BASE_EVENT,
+      });
+
+      const snapshotResponse = await app.inject({
+        method: "GET",
+        url: "/snapshot",
+      });
+
+      expect(snapshotResponse.json()).toMatchObject({
+        displayLabel: "Piano Intro",
+        rawName: "Concert Grand",
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
   it("serves alias-resolved snapshots after ingest", async () => {
     const aliasFilePath = await createAliasFile([
       {
@@ -152,4 +190,56 @@ async function createAliasFile(records: unknown[]): Promise<string> {
   await writeFile(aliasFilePath, `${JSON.stringify(records, null, 2)}\n`, "utf8");
 
   return aliasFilePath;
+}
+
+async function runAliasSetCommand(options: {
+  aliasFilePath: string;
+  layerKey: string;
+  stageLabel: string;
+}): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      "npm",
+      [
+        "run",
+        "alias:set",
+        "--",
+        "--layer-key",
+        options.layerKey,
+        "--stage-label",
+        options.stageLabel,
+      ],
+      {
+        cwd: process.cwd(),
+        env: {
+          ...process.env,
+          COMPANION_ALIAS_FILE_PATH: options.aliasFilePath,
+        },
+      },
+    );
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve(stdout);
+        return;
+      }
+
+      reject(
+        new Error(
+          `alias:set command failed with exit code ${code}: ${stderr || stdout}`,
+        ),
+      );
+    });
+  });
 }

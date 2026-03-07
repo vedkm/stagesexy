@@ -20,6 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CompanionIngestClientTest {
     @Test
+    void usesDeterministicLocalIngestUrlByDefault() {
+        final CompanionIngestClient client = new CompanionIngestClient();
+
+        assertEquals("http://127.0.0.1:3197/ingest", client.ingestUri().toString());
+    }
+
+    @Test
     void postsNormalizedInstrumentPayloadToCompanionIngestRoute() throws Exception {
         final AtomicReference<String> requestMethod = new AtomicReference<>();
         final AtomicReference<String> contentType = new AtomicReference<>();

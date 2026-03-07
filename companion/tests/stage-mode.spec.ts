@@ -1,12 +1,16 @@
+import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { setTimeout as delay } from "node:timers/promises";
+import { fileURLToPath } from "node:url";
 
 import { expect, test } from "@playwright/test";
-import type { FastifyInstance } from "fastify";
-
-import { buildCompanionApp } from "../src/server/app";
 import type { NormalizedInstrumentEvent } from "../src/types/stage";
+
+const COMPANION_ORIGIN = "http://127.0.0.1:3197";
+const COMPANION_ROOT = fileURLToPath(new URL("..", import.meta.url));
+const NPM_COMMAND = process.platform === "win32" ? "npm.cmd" : "npm";
 
 test("renders live alias updates and truthful freshness transitions", async ({
   page,
@@ -16,7 +20,7 @@ test("renders live alias updates and truthful freshness transitions", async ({
 
   const tempDirectory = await mkdtemp(join(tmpdir(), "stage-display-e2e-"));
   const aliasFilePath = join(tempDirectory, "aliases.json");
-  let companionApp: FastifyInstance | null = null;
+  let runtimeProcess: ChildProcessWithoutNullStreams | null = null;
 
   await writeFile(
     aliasFilePath,
@@ -34,19 +38,7 @@ test("renders live alias updates and truthful freshness transitions", async ({
   );
 
   try {
-    companionApp = await buildCompanionApp({
-      aliasFilePath,
-      thresholds: {
-        staleAfterMs: 1_000,
-        disconnectedAfterMs: 2_200,
-      },
-      statusCheckMs: 25,
-    });
-
-    await companionApp.listen({
-      host: "127.0.0.1",
-      port: 3197,
-    });
+    runtimeProcess = await startCompanionRuntime(aliasFilePath);
 
     await page.goto("/stage");
 
@@ -63,7 +55,7 @@ test("renders live alias updates and truthful freshness transitions", async ({
       occurredAt: new Date().toISOString(),
     };
 
-    await request.post("http://127.0.0.1:3197/ingest", {
+    await request.post(`${COMPANION_ORIGIN}/ingest`, {
       data: instrumentEvent,
     });
 
@@ -84,7 +76,7 @@ test("renders live alias updates and truthful freshness transitions", async ({
       .poll(() => page.evaluate(() => document.fullscreenElement === null))
       .toBe(true);
 
-    await request.post("http://127.0.0.1:3197/ingest", {
+    await request.post(`${COMPANION_ORIGIN}/ingest`, {
       data: {
         ...instrumentEvent,
         sequence: 22,
@@ -104,10 +96,81 @@ test("renders live alias updates and truthful freshness transitions", async ({
   } finally {
     await page.goto("about:blank");
 
-    if (companionApp) {
-      await companionApp.close();
+    if (runtimeProcess) {
+      await stopCompanionRuntime(runtimeProcess);
     }
 
     await rm(tempDirectory, { recursive: true, force: true });
   }
 });
+
+async function startCompanionRuntime(
+  aliasFilePath: string,
+): Promise<ChildProcessWithoutNullStreams> {
+  const runtimeProcess = spawn(NPM_COMMAND, ["run", "start:server"], {
+    cwd: COMPANION_ROOT,
+    env: {
+      ...process.env,
+      COMPANION_ALIAS_FILE_PATH: aliasFilePath,
+      COMPANION_STATUS_CHECK_MS: "25",
+      COMPANION_STALE_AFTER_MS: "1000",
+      COMPANION_DISCONNECTED_AFTER_MS: "2200",
+    },
+    stdio: "pipe",
+  });
+  let runtimeOutput = "";
+
+  runtimeProcess.stdout.setEncoding("utf8");
+  runtimeProcess.stderr.setEncoding("utf8");
+  runtimeProcess.stdout.on("data", (chunk: string) => {
+    runtimeOutput += chunk;
+  });
+  runtimeProcess.stderr.on("data", (chunk: string) => {
+    runtimeOutput += chunk;
+  });
+
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    if (runtimeProcess.exitCode !== null) {
+      throw new Error(
+        `Companion runtime exited before becoming ready.\n${runtimeOutput}`,
+      );
+    }
+
+    try {
+      const response = await fetch(`${COMPANION_ORIGIN}/snapshot`);
+
+      if (response.ok) {
+        return runtimeProcess;
+      }
+    } catch {
+      // The runtime is still starting up.
+    }
+
+    await delay(250);
+  }
+
+  await stopCompanionRuntime(runtimeProcess);
+  throw new Error(
+    `Companion runtime did not become ready at ${COMPANION_ORIGIN}.\n${runtimeOutput}`,
+  );
+}
+
+async function stopCompanionRuntime(
+  runtimeProcess: ChildProcessWithoutNullStreams,
+): Promise<void> {
+  if (runtimeProcess.exitCode !== null) {
+    return;
+  }
+
+  runtimeProcess.kill("SIGTERM");
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (runtimeProcess.exitCode !== null) {
+      return;
+    }
+
+    await delay(100);
+  }
+
+  runtimeProcess.kill("SIGKILL");
+}

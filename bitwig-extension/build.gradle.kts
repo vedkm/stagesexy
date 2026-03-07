@@ -25,7 +25,7 @@ tasks.test {
 }
 
 dependencies {
-    implementation("com.bitwig:extension-api:22")
+    implementation("com.bitwig:extension-api:19")
 
     testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")

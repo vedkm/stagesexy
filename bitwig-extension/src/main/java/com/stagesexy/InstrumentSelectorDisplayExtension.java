@@ -10,6 +10,7 @@ import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.DeviceLayer;
 import com.bitwig.extension.controller.api.DeviceLayerBank;
 import com.bitwig.extension.controller.api.PinnableCursorDevice;
+import com.bitwig.extension.controller.api.ChainSelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
 
     @Override
     public int getRequiredAPIVersion() {
-        return 22;
+        return 19;
     }
 
     @Override
@@ -80,11 +81,13 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
     private static final class ExtensionInstance extends ControllerExtension {
         private static final int OBSERVED_LAYER_COUNT = 16;
         private static final String FALLBACK_SELECTOR_IDENTITY = "selected-track:first-instrument";
-
         private final List<ObservedLayer> observedLayers = new ArrayList<>();
         private CursorTrack cursorTrack;
         private PinnableCursorDevice selectorDevice;
+        private ChainSelector chainSelector;
         private NormalizedInstrumentPublisher publisher;
+        private int lastPublishedChainIndex = Integer.MIN_VALUE;
+        private String lastPublishedChainName = "";
 
         private ExtensionInstance(
             final InstrumentSelectorDisplayExtension definition,
@@ -112,10 +115,18 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
                 0,
                 CursorDeviceFollowMode.FIRST_INSTRUMENT
             );
+            chainSelector = selectorDevice.createChainSelector();
 
             selectorDevice.name().markInterested();
             selectorDevice.exists().markInterested();
             selectorDevice.hasLayers().markInterested();
+            chainSelector.activeChainIndex().markInterested();
+            chainSelector.activeChain().name().markInterested();
+            chainSelector.activeChain().exists().markInterested();
+
+            selectorDevice.name().addValueObserver(value -> publishSelectedChainIfReady());
+            chainSelector.activeChainIndex().addValueObserver(value -> publishSelectedChainIfReady(), 128);
+            chainSelector.activeChain().exists().addValueObserver(value -> publishSelectedChainIfReady());
 
             registerLayerObservers(selectorDevice.createLayerBank(OBSERVED_LAYER_COUNT));
 
@@ -133,45 +144,6 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
                 final ObservedLayer observedLayer = new ObservedLayer(index, layer);
                 observedLayers.add(observedLayer);
             }
-        }
-
-        private void handleObservedLayerChange() {
-            if (!selectorDevice.exists().get()) {
-                return;
-            }
-
-            if (!selectorDevice.hasLayers().get()) {
-                throw new IllegalStateException(
-                    "Observed device does not expose layers. This extension only supports Bitwig Instrument Selector state."
-                );
-            }
-
-            final List<ObservedLayer> activeLayers = observedLayers.stream()
-                .filter(ObservedLayer::exists)
-                .filter(ObservedLayer::activated)
-                .toList();
-
-            if (activeLayers.size() > 1) {
-                throw new IllegalStateException(
-                    "Observed multiple active layers. Active Instrument Selector truth must map to exactly one playable layer."
-                );
-            }
-
-            if (activeLayers.isEmpty()) {
-                return;
-            }
-
-            final ObservedLayer activeLayer = activeLayers.get(0);
-            publisher.publish(
-                new NormalizedInstrumentPublisher.SelectorObservation(
-                    FALLBACK_SELECTOR_IDENTITY,
-                    requireName(selectorDevice.name().get(), "selectorName"),
-                    activeLayer.index(),
-                    requireName(activeLayer.name(), "rawName"),
-                    null,
-                    NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
-                )
-            );
         }
 
         @Override
@@ -193,37 +165,25 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
             private final int index;
             private String name = "";
             private boolean exists;
-            private boolean activated;
 
             private ObservedLayer(final int index, final DeviceLayer layer) {
                 this.index = index;
 
                 layer.name().markInterested();
                 layer.exists().markInterested();
-                layer.isActivated().markInterested();
 
                 layer.exists().addValueObserver(value -> {
                     exists = value;
-                    handleObservedLayerChange();
+                    publishSelectedChainIfReady();
                 });
                 layer.name().addValueObserver(value -> {
                     name = value;
-                    if (activated) {
-                        handleObservedLayerChange();
-                    }
-                });
-                layer.isActivated().addValueObserver(value -> {
-                    activated = value;
-                    handleObservedLayerChange();
+                    publishSelectedChainIfReady();
                 });
             }
 
             private boolean exists() {
                 return exists;
-            }
-
-            private boolean activated() {
-                return activated;
             }
 
             private int index() {
@@ -233,6 +193,44 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
             private String name() {
                 return name;
             }
+        }
+
+        private void publishSelectedChainIfReady() {
+            final boolean activeChainExists = chainSelector.activeChain().exists().get();
+            final int activeChainIndex = chainSelector.activeChainIndex().get();
+            final String selectorName = selectorDevice.name().get();
+            final String observedLayerName = activeChainIndex >= 0 && activeChainIndex < observedLayers.size()
+                ? observedLayers.get(activeChainIndex).name()
+                : "";
+
+            if (!activeChainExists || activeChainIndex < 0 || activeChainIndex >= OBSERVED_LAYER_COUNT) {
+                return;
+            }
+
+            final String trimmedSelectorName = selectorName == null ? "" : selectorName.trim();
+            final String trimmedChainName = observedLayerName == null ? "" : observedLayerName.trim();
+
+            if (trimmedSelectorName.isEmpty() || trimmedChainName.isEmpty()) {
+                return;
+            }
+
+            if (activeChainIndex == lastPublishedChainIndex && trimmedChainName.equals(lastPublishedChainName)) {
+                return;
+            }
+
+            publisher.publish(
+                new NormalizedInstrumentPublisher.SelectorObservation(
+                    FALLBACK_SELECTOR_IDENTITY,
+                    trimmedSelectorName,
+                    activeChainIndex,
+                    trimmedChainName,
+                    null,
+                    NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
+                )
+            );
+
+            lastPublishedChainIndex = activeChainIndex;
+            lastPublishedChainName = trimmedChainName;
         }
     }
 }

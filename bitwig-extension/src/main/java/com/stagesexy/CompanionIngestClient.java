@@ -1,22 +1,20 @@
 package com.stagesexy;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public final class CompanionIngestClient {
-    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
-    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(2);
+    private static final int CONNECT_TIMEOUT_MS = 2_000;
+    private static final int REQUEST_TIMEOUT_MS = 2_000;
     private static final int SUCCESS_STATUS_MIN = 200;
     private static final int SUCCESS_STATUS_MAX = 299;
-
     static final URI DEFAULT_INGEST_URI = URI.create("http://127.0.0.1:3197/ingest");
 
-    private final HttpClient httpClient;
     private final URI ingestUri;
 
     public CompanionIngestClient() {
@@ -24,16 +22,6 @@ public final class CompanionIngestClient {
     }
 
     public CompanionIngestClient(final URI ingestUri) {
-        this(
-            HttpClient.newBuilder()
-                .connectTimeout(CONNECT_TIMEOUT)
-                .build(),
-            ingestUri
-        );
-    }
-
-    CompanionIngestClient(final HttpClient httpClient, final URI ingestUri) {
-        this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
         this.ingestUri = Objects.requireNonNull(ingestUri, "ingestUri must not be null");
     }
 
@@ -42,24 +30,28 @@ public final class CompanionIngestClient {
             throw new IllegalArgumentException("payload must not be blank");
         }
 
-        final HttpRequest request = HttpRequest.newBuilder(ingestUri)
-            .timeout(REQUEST_TIMEOUT)
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(payload))
-            .build();
+        final byte[] requestBody = payload.getBytes(StandardCharsets.UTF_8);
 
         try {
-            final HttpResponse<Void> response = httpClient.send(
-                request,
-                HttpResponse.BodyHandlers.discarding()
-            );
+            final HttpURLConnection connection = (HttpURLConnection) ingestUri.toURL().openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            connection.setReadTimeout(REQUEST_TIMEOUT_MS);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
 
-            if (!isSuccessStatus(response.statusCode())) {
+            try (OutputStream requestStream = connection.getOutputStream()) {
+                requestStream.write(requestBody);
+            }
+
+            final int statusCode = connection.getResponseCode();
+            closeResponseBody(connection, statusCode);
+            if (!isSuccessStatus(statusCode)) {
                 throw new IllegalStateException(
                     "Failed to POST normalized instrument event to companion /ingest at "
                         + ingestUri
                         + ". Received HTTP "
-                        + response.statusCode()
+                        + statusCode
                         + "."
                 );
             }
@@ -68,14 +60,6 @@ public final class CompanionIngestClient {
                 "Failed to POST normalized instrument event to companion /ingest at "
                     + ingestUri
                     + ". Ensure the companion truth service is running and reachable.",
-                exception
-            );
-        } catch (final InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(
-                "Interrupted while posting normalized instrument event to companion /ingest at "
-                    + ingestUri
-                    + ".",
                 exception
             );
         }
@@ -87,5 +71,24 @@ public final class CompanionIngestClient {
 
     private static boolean isSuccessStatus(final int statusCode) {
         return statusCode >= SUCCESS_STATUS_MIN && statusCode <= SUCCESS_STATUS_MAX;
+    }
+
+    private static void closeResponseBody(
+        final HttpURLConnection connection,
+        final int statusCode
+    ) throws IOException {
+        final InputStream responseStream = isSuccessStatus(statusCode)
+            ? connection.getInputStream()
+            : connection.getErrorStream();
+
+        if (responseStream == null) {
+            return;
+        }
+
+        try (InputStream stream = responseStream) {
+            while (stream.read() != -1) {
+                // Drain the response so the connection can close cleanly.
+            }
+        }
     }
 }

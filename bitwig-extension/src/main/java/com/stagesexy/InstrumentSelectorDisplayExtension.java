@@ -13,6 +13,7 @@ import com.bitwig.extension.controller.api.PinnableCursorDevice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefinition {
@@ -78,10 +79,12 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
 
     private static final class ExtensionInstance extends ControllerExtension {
         private static final int OBSERVED_LAYER_COUNT = 16;
+        private static final String FALLBACK_SELECTOR_IDENTITY = "selected-track:first-instrument";
 
         private final List<ObservedLayer> observedLayers = new ArrayList<>();
         private CursorTrack cursorTrack;
         private PinnableCursorDevice selectorDevice;
+        private NormalizedInstrumentPublisher publisher;
 
         private ExtensionInstance(
             final InstrumentSelectorDisplayExtension definition,
@@ -94,6 +97,7 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
         public void init() {
             final ControllerHost host = getHost();
 
+            publisher = new NormalizedInstrumentPublisher(host::println);
             cursorTrack = host.createCursorTrack(
                 "stage-selector-track",
                 "Stage Selector Track",
@@ -128,22 +132,42 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
         }
 
         private void handleObservedLayerChange() {
+            if (!selectorDevice.exists().get()) {
+                return;
+            }
+
             if (!selectorDevice.hasLayers().get()) {
                 throw new IllegalStateException(
                     "Observed device does not expose layers. This extension only supports Bitwig Instrument Selector state."
                 );
             }
 
-            final long activeLayerCount = observedLayers.stream()
+            final List<ObservedLayer> activeLayers = observedLayers.stream()
                 .filter(ObservedLayer::exists)
                 .filter(ObservedLayer::activated)
-                .count();
+                .toList();
 
-            if (activeLayerCount > 1) {
+            if (activeLayers.size() > 1) {
                 throw new IllegalStateException(
                     "Observed multiple active layers. Active Instrument Selector truth must map to exactly one playable layer."
                 );
             }
+
+            if (activeLayers.isEmpty()) {
+                return;
+            }
+
+            final ObservedLayer activeLayer = activeLayers.get(0);
+            publisher.publish(
+                new NormalizedInstrumentPublisher.SelectorObservation(
+                    FALLBACK_SELECTOR_IDENTITY,
+                    requireName(selectorDevice.name().get(), "selectorName"),
+                    activeLayer.index(),
+                    requireName(activeLayer.name(), "rawName"),
+                    null,
+                    NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
+                )
+            );
         }
 
         @Override
@@ -154,8 +178,16 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
         public void flush() {
         }
 
+        private String requireName(final String value, final String fieldName) {
+            return Optional.ofNullable(value)
+                .map(String::trim)
+                .filter(text -> !text.isEmpty())
+                .orElseThrow(() -> new IllegalStateException(fieldName + " must not be blank"));
+        }
+
         private final class ObservedLayer {
             private final int index;
+            private String name = "";
             private boolean exists;
             private boolean activated;
 
@@ -170,6 +202,12 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
                     exists = value;
                     handleObservedLayerChange();
                 });
+                layer.name().addValueObserver(value -> {
+                    name = value;
+                    if (activated) {
+                        handleObservedLayerChange();
+                    }
+                });
                 layer.isActivated().addValueObserver(value -> {
                     activated = value;
                     handleObservedLayerChange();
@@ -182,6 +220,14 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
 
             private boolean activated() {
                 return activated;
+            }
+
+            private int index() {
+                return index;
+            }
+
+            private String name() {
+                return name;
             }
         }
     }

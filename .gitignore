@@ -1,0 +1,4 @@
+.cursor/debug-*.log
+bitwig-extension/.gradle/
+bitwig-extension/.gradle-docker/
+bitwig-extension/build/

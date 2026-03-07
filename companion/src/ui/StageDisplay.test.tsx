@@ -23,6 +23,7 @@ describe("StageDisplay", () => {
       screen.getByRole("heading", { name: "Piano Intro" }),
     ).toBeInTheDocument();
     expect(screen.getByText("live")).toBeInTheDocument();
+    expect(screen.getAllByText("Keys")).toHaveLength(2);
     expect(screen.queryByText("Concert Grand")).not.toBeInTheDocument();
   });
 
@@ -41,6 +42,7 @@ describe("StageDisplay", () => {
     render(<StageDisplay snapshot={snapshot} />);
 
     expect(screen.getByText("stale")).toBeInTheDocument();
+    expect(screen.getAllByText("Lead Synth")).toHaveLength(2);
     expect(screen.queryByText("live")).not.toBeInTheDocument();
   });
 });

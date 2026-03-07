@@ -8,7 +8,7 @@ function App() {
   const { snapshot } = useStageStream();
 
   return (
-    <div className="stage-shell" ref={stageElementRef}>
+    <section className="stage-shell" ref={stageElementRef}>
       <button
         className="stage-shell__fullscreen-toggle"
         type="button"
@@ -18,7 +18,7 @@ function App() {
         {isFullscreen ? "Exit Stage Mode" : "Enter Stage Mode"}
       </button>
       <StageDisplay snapshot={snapshot} />
-    </div>
+    </section>
   );
 }
 

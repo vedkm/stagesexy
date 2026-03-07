@@ -61,23 +61,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISP-01 | Phase [N] | Pending |
-| DISP-02 | Phase [N] | Pending |
-| DISP-03 | Phase [N] | Pending |
-| DISP-04 | Phase [N] | Pending |
-| PHON-01 | Phase [N] | Pending |
-| PHON-02 | Phase [N] | Pending |
-| PHON-03 | Phase [N] | Pending |
-| LABL-01 | Phase [N] | Pending |
-| LABL-02 | Phase [N] | Pending |
-| LABL-03 | Phase [N] | Pending |
-| PROF-01 | Phase [N] | Pending |
+| DISP-01 | Phase 1 | Pending |
+| DISP-02 | Phase 1 | Pending |
+| DISP-03 | Phase 1 | Pending |
+| DISP-04 | Phase 1 | Pending |
+| PHON-01 | Phase 2 | Pending |
+| PHON-02 | Phase 2 | Pending |
+| PHON-03 | Phase 2 | Pending |
+| LABL-01 | Phase 1 | Pending |
+| LABL-02 | Phase 3 | Pending |
+| LABL-03 | Phase 3 | Pending |
+| PROF-01 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11 ⚠️
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after initial definition*
+*Last updated: 2026-03-07 after roadmap creation*

@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "fastify": "^5.8.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

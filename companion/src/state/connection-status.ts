@@ -11,9 +11,29 @@ export const DEFAULT_FRESHNESS_THRESHOLDS: FreshnessThresholds = {
 };
 
 export function resolveConnectionStatus(
-  _snapshot: StageSnapshot,
-  _now: Date,
-  _thresholds: FreshnessThresholds = DEFAULT_FRESHNESS_THRESHOLDS,
+  snapshot: StageSnapshot,
+  now: Date,
+  thresholds: FreshnessThresholds = DEFAULT_FRESHNESS_THRESHOLDS,
 ): ConnectionStatus {
-  throw new Error("resolveConnectionStatus is not implemented yet.");
+  if (!snapshot.updatedAt) {
+    return "disconnected";
+  }
+
+  const updatedAt = new Date(snapshot.updatedAt);
+
+  if (Number.isNaN(updatedAt.getTime())) {
+    return "disconnected";
+  }
+
+  const elapsedMs = now.getTime() - updatedAt.getTime();
+
+  if (elapsedMs >= thresholds.disconnectedAfterMs) {
+    return "disconnected";
+  }
+
+  if (elapsedMs >= thresholds.staleAfterMs) {
+    return "stale";
+  }
+
+  return "live";
 }

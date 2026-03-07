@@ -96,8 +96,9 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
         @Override
         public void init() {
             final ControllerHost host = getHost();
+            final CompanionIngestClient ingestClient = new CompanionIngestClient();
 
-            publisher = new NormalizedInstrumentPublisher(host::println);
+            publisher = new NormalizedInstrumentPublisher(ingestClient::publish);
             cursorTrack = host.createCursorTrack(
                 "stage-selector-track",
                 "Stage Selector Track",
@@ -118,7 +119,10 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
 
             registerLayerObservers(selectorDevice.createLayerBank(OBSERVED_LAYER_COUNT));
 
-            host.println("Stage Sexy Instrument Selector Display initialized.");
+            host.println(
+                "Stage Sexy Instrument Selector Display initialized. Publishing normalized events to "
+                    + CompanionIngestClient.DEFAULT_INGEST_URI
+            );
         }
 
         private void registerLayerObservers(final DeviceLayerBank layerBank) {

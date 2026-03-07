@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **DISP-01**: Performer can see the active `Instrument Selector` instrument in giant high-contrast text on the laptop
 - [x] **DISP-02**: Performer can switch the laptop view into a dedicated full-screen stage mode
-- [ ] **DISP-03**: Laptop display updates near-instantly when the active `Instrument Selector` instrument changes
+- [x] **DISP-03**: Laptop display updates near-instantly when the active `Instrument Selector` instrument changes
 - [ ] **DISP-04**: Laptop display shows whether instrument state is live, stale, or disconnected
 
 ### Phone Mirror
@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Instrument Context
 
-- [ ] **LABL-01**: Performer can define stable stage labels or aliases for instruments so display names match live expectations
+- [x] **LABL-01**: Performer can define stable stage labels or aliases for instruments so display names match live expectations
 - [ ] **LABL-02**: Performer can see previous, current, and next instrument context while switching sequentially
 - [ ] **LABL-03**: Performer can show a secondary detail line for notes or cues related to the active instrument
 
@@ -63,12 +63,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | DISP-01 | Phase 1 | Complete |
 | DISP-02 | Phase 1 | Complete |
-| DISP-03 | Phase 1 | Pending |
+| DISP-03 | Phase 1 | Complete |
 | DISP-04 | Phase 1 | Pending |
 | PHON-01 | Phase 2 | Pending |
 | PHON-02 | Phase 2 | Pending |
 | PHON-03 | Phase 2 | Pending |
-| LABL-01 | Phase 1 | Pending |
+| LABL-01 | Phase 1 | Complete |
 | LABL-02 | Phase 3 | Pending |
 | LABL-03 | Phase 3 | Pending |
 | PROF-01 | Phase 3 | Pending |

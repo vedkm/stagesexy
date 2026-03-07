@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 Plans:
 - [x] `01-01-PLAN.md` - Scaffold the companion workspace, shared truth contracts, and failing validation tests
-- [ ] `01-02-PLAN.md` - Verify the Bitwig `Instrument Selector` observer chain and emit normalized bridge events
+- [x] `01-02-PLAN.md` - Verify the Bitwig `Instrument Selector` observer chain and emit normalized bridge events
 - [x] `01-03-PLAN.md` - Build the fullscreen laptop stage UI against mocked snapshot contracts
 - [ ] `01-04-PLAN.md` - Integrate the companion truth pipeline, alias persistence, and live laptop display
 
@@ -61,6 +61,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Truthful Laptop Display | 2/4 | In Progress | 2026-03-07 |
+| 1. Truthful Laptop Display | 3/4 | In Progress | 2026-03-07 |
 | 2. Phone Mirror and Fallback Path | 0/TBD | Not started | - |
 | 3. Performer Context and Rig Profiles | 0/TBD | Not started | - |

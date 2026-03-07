@@ -47,6 +47,7 @@ export async function buildCompanionApp(
   let lastPublishedStatus = stageStore.getSnapshot({ now: getNow() }).status;
 
   const app = Fastify({
+    forceCloseConnections: true,
     logger: false,
   });
 

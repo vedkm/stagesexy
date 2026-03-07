@@ -14,6 +14,9 @@ export function registerEventsRoute(
   app.get("/events", async (request, reply) => {
     const snapshot = await options.getSnapshot();
 
+    reply.raw.setHeader("Access-Control-Allow-Origin", "*");
+    reply.raw.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    reply.raw.setHeader("Access-Control-Allow-Headers", "Content-Type");
     reply.raw.setHeader("Content-Type", "text/event-stream; charset=utf-8");
     reply.raw.setHeader("Cache-Control", "no-cache, no-transform");
     reply.raw.setHeader("Connection", "keep-alive");

@@ -1,4 +1,5 @@
 import { StageDisplay } from "./ui/StageDisplay";
+import { useFullscreenStageMode } from "./ui/useFullscreenStageMode";
 import type { StageSnapshot } from "./types/stage";
 
 const MOCK_SNAPSHOTS: readonly StageSnapshot[] = [
@@ -35,8 +36,21 @@ const MOCK_SNAPSHOTS: readonly StageSnapshot[] = [
 ];
 
 function App() {
+  const { isFullscreen, isSupported, stageElementRef, toggleFullscreen } =
+    useFullscreenStageMode();
+
   return (
-    <StageDisplay snapshot={MOCK_SNAPSHOTS[0]} />
+    <div className="stage-shell" ref={stageElementRef}>
+      <button
+        className="stage-shell__fullscreen-toggle"
+        type="button"
+        onClick={() => void toggleFullscreen()}
+        disabled={!isSupported}
+      >
+        {isFullscreen ? "Exit Fullscreen Stage Mode" : "Enter Fullscreen Stage Mode"}
+      </button>
+      <StageDisplay snapshot={MOCK_SNAPSHOTS[0]} />
+    </div>
   );
 }
 

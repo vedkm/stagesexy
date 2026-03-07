@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "alias:set": "tsx src/labels/set-alias.ts",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test:unit": "node ./scripts/run-vitest.mjs",

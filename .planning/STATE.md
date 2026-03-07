@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-03-07T13:58:04Z"
-last_activity: 2026-03-07 - Completed Plan 01-02 Bitwig observer validation and normalized bridge events
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-03-07T14:20:17Z"
+last_activity: 2026-03-07 - Completed Plan 01-04 local truth pipeline and live laptop display
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -21,34 +21,35 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-03-07)
 
 **Core value:** When the performer changes instruments in Bitwig, the current instrument name is shown immediately and clearly enough to trust on stage without relying on the normal Bitwig UI.
-**Current focus:** Phase 1 - Truthful Laptop Display
+**Current focus:** Phase 2 - Phone Mirror and Fallback Path
 
 ## Current Position
 
 Phase: 1 of 3 (Truthful Laptop Display)
 Plan: 4 of 4 in current phase
-Status: In progress
-Last activity: 2026-03-07 - Completed Plan 01-02 Bitwig observer validation and normalized bridge events
+Status: Complete
+Last activity: 2026-03-07 - Completed Plan 01-04 local truth pipeline and live laptop display
 
-Progress: [████████░░] 75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 7 min
-- Total execution time: 0.4 hours
+- Total plans completed: 4
+- Average duration: 8 min
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 3 | 21 | 7 min |
+| 1 | 4 | 34 | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-03 (2 min), 01-02 (15 min)
+- Last 5 plans: 01-01 (4 min), 01-03 (2 min), 01-02 (15 min), 01-04 (13 min)
 - Trend: Stable
 | Phase 01 P02 | 15 min | 2 tasks | 10 files |
+| Phase 01 P04 | 13 min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -67,10 +68,13 @@ Recent decisions affecting current work:
 - [Phase 01]: Use the browser Fullscreen API on the existing stage shell instead of creating a second desktop-specific surface. — Browser-native fullscreen keeps stage mode simple, testable, and aligned with the plan scope.
 - [Phase 01]: Observe Instrument Selector truth through selected track -> first instrument -> layer activation instead of any UI-followed device selection. — This keeps the source tied to the playable path rather than editor focus.
 - [Phase 01]: Use `selected-track:first-instrument:{layer index}` as the documented fallback `layerKey` until Bitwig exposes a verified durable per-layer id. — This keeps alias persistence stable across raw-name changes without overstating identity guarantees.
+- [Phase 01]: Resolve aliases on the companion server from a persisted local file so the browser only renders finalized stage labels.
+- [Phase 01]: Drive laptop freshness truth from the companion with explicit live, stale, and disconnected transitions that continue even when Bitwig stops sending updates.
+- [Phase 01]: Hydrate the React shell from /snapshot and /events instead of keeping any mocked snapshot path in App.tsx.
 
 ### Pending Todos
 
-- Execute `01-04-PLAN.md` to integrate the companion truth pipeline, alias persistence, and live laptop display.
+- Plan Phase 2 so the new laptop truth pipeline can be mirrored to a phone without weakening the laptop fallback.
 
 ### Blockers/Concerns
 
@@ -79,6 +83,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-07T13:57:26.226Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-03-07T14:19:58.232Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

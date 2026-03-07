@@ -12,7 +12,7 @@ This roadmap stays intentionally narrow: first make the laptop path truthful and
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Truthful Laptop Display** - Deliver the trusted laptop-first stage display driven by active `Instrument Selector` state.
+- [x] **Phase 1: Truthful Laptop Display** - Deliver the trusted laptop-first stage display driven by active `Instrument Selector` state.
 - [ ] **Phase 2: Phone Mirror and Fallback Path** - Add a local phone mirror while keeping the laptop display available as the dependable fallback.
 - [ ] **Phase 3: Performer Context and Rig Profiles** - Add richer switching context and reusable profile support for a few similar rigs.
 
@@ -32,7 +32,7 @@ Plans:
 - [x] `01-01-PLAN.md` - Scaffold the companion workspace, shared truth contracts, and failing validation tests
 - [x] `01-02-PLAN.md` - Verify the Bitwig `Instrument Selector` observer chain and emit normalized bridge events
 - [x] `01-03-PLAN.md` - Build the fullscreen laptop stage UI against mocked snapshot contracts
-- [ ] `01-04-PLAN.md` - Integrate the companion truth pipeline, alias persistence, and live laptop display
+- [x] `01-04-PLAN.md` - Integrate the companion truth pipeline, alias persistence, and live laptop display
 
 ### Phase 2: Phone Mirror and Fallback Path
 **Goal**: Performer can mirror the same current instrument state to a phone over a simple local browser path without losing the laptop as the trusted fallback display.
@@ -61,6 +61,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Truthful Laptop Display | 3/4 | In Progress | 2026-03-07 |
+| 1. Truthful Laptop Display | 4/4 | Complete | 2026-03-07 |
 | 2. Phone Mirror and Fallback Path | 0/TBD | Not started | - |
 | 3. Performer Context and Rig Profiles | 0/TBD | Not started | - |

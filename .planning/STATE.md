@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-03-07T14:20:17Z"
-last_activity: 2026-03-07 - Completed Plan 01-04 local truth pipeline and live laptop display
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-03-07T14:54:00.205Z"
+last_activity: 2026-03-07 - Completed Plan 01-05 real Bitwig ingest transport and companion runtime entrypoint
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 0
+  total_plans: 7
+  completed_plans: 5
+  percent: 71
 ---
 
 # Project State
@@ -21,35 +21,36 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-03-07)
 
 **Core value:** When the performer changes instruments in Bitwig, the current instrument name is shown immediately and clearly enough to trust on stage without relying on the normal Bitwig UI.
-**Current focus:** Phase 2 - Phone Mirror and Fallback Path
+**Current focus:** Phase 1 - close the remaining alias-management and human-rehearsal gaps for the truthful laptop display
 
 ## Current Position
 
 Phase: 1 of 3 (Truthful Laptop Display)
-Plan: 4 of 4 in current phase
-Status: Complete
-Last activity: 2026-03-07 - Completed Plan 01-04 local truth pipeline and live laptop display
+Plan: 5 of 7 in current phase
+Status: In Progress
+Last activity: 2026-03-07 - Completed Plan 01-05 real Bitwig ingest transport and companion runtime entrypoint
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 8 min
-- Total execution time: 0.6 hours
+- Total plans completed: 5
+- Average duration: 9 min
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 4 | 34 | 8 min |
+| 1 | 5 | 43 | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-03 (2 min), 01-02 (15 min), 01-04 (13 min)
+- Last 5 plans: 01-01 (4 min), 01-03 (2 min), 01-02 (15 min), 01-04 (13 min), 01-05 (9 min)
 - Trend: Stable
 | Phase 01 P02 | 15 min | 2 tasks | 10 files |
 | Phase 01 P04 | 13 min | 2 tasks | 16 files |
+| Phase 01 P05 | 9 min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -71,18 +72,23 @@ Recent decisions affecting current work:
 - [Phase 01]: Resolve aliases on the companion server from a persisted local file so the browser only renders finalized stage labels.
 - [Phase 01]: Drive laptop freshness truth from the companion with explicit live, stale, and disconnected transitions that continue even when Bitwig stops sending updates.
 - [Phase 01]: Hydrate the React shell from /snapshot and /events instead of keeping any mocked snapshot path in App.tsx.
+- [Plan 01-05]: Post normalized Bitwig events to `http://127.0.0.1:3197/ingest` so the source bridge and companion share one production transport path.
+- [Plan 01-05]: Start the companion truth service through `npm run start:server`, with env overrides for rehearsal and automated smoke coverage.
+- [Plan 01-05]: Verify the laptop browser path by spawning the real companion runtime command instead of constructing the Fastify app directly in Playwright.
 
 ### Pending Todos
 
-- Plan Phase 2 so the new laptop truth pipeline can be mirrored to a phone without weakening the laptop fallback.
+- Execute `01-06` to expose alias writes through a public companion command.
+- Execute `01-07` for human rehearsal against the real Bitwig -> companion -> laptop path.
 
 ### Blockers/Concerns
 
 - [Phase 1]: The fallback `layerKey` is position-based because the verified public Bitwig path here did not surface a durable per-layer identifier; layer reordering may require alias remapping.
+- [Phase 1]: This machine does not have Java 21 installed locally, so Bitwig-side verification currently depends on the repository-owned Docker fallback path.
 - [Phase 2]: Phone browser behavior and LAN access need testing on the actual target phone and venue-like network conditions.
 
 ## Session Continuity
 
-Last session: 2026-03-07T14:19:58.232Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-03-07T14:54:00.203Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None

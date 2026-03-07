@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Display
 
-- [ ] **DISP-01**: Performer can see the active `Instrument Selector` instrument in giant high-contrast text on the laptop
-- [ ] **DISP-02**: Performer can switch the laptop view into a dedicated full-screen stage mode
+- [x] **DISP-01**: Performer can see the active `Instrument Selector` instrument in giant high-contrast text on the laptop
+- [x] **DISP-02**: Performer can switch the laptop view into a dedicated full-screen stage mode
 - [ ] **DISP-03**: Laptop display updates near-instantly when the active `Instrument Selector` instrument changes
 - [ ] **DISP-04**: Laptop display shows whether instrument state is live, stale, or disconnected
 
@@ -61,8 +61,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISP-01 | Phase 1 | Pending |
-| DISP-02 | Phase 1 | Pending |
+| DISP-01 | Phase 1 | Complete |
+| DISP-02 | Phase 1 | Complete |
 | DISP-03 | Phase 1 | Pending |
 | DISP-04 | Phase 1 | Pending |
 | PHON-01 | Phase 2 | Pending |

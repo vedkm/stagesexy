@@ -27,7 +27,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Performer can switch the laptop view into a dedicated full-screen stage mode for live use.
   3. Laptop display updates near-instantly when the active `Instrument Selector` instrument changes and visibly shows `live`, `stale`, or `disconnected` status instead of implying old data is current.
   4. Performer can define stable stage labels so the displayed instrument name matches live expectations rather than raw Bitwig naming.
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [x] `01-01-PLAN.md` - Scaffold the companion workspace, shared truth contracts, and failing validation tests
+- [ ] `01-02-PLAN.md` - Verify the Bitwig `Instrument Selector` observer chain and emit normalized bridge events
+- [ ] `01-03-PLAN.md` - Build the fullscreen laptop stage UI against mocked snapshot contracts
+- [ ] `01-04-PLAN.md` - Integrate the companion truth pipeline, alias persistence, and live laptop display
 
 ### Phase 2: Phone Mirror and Fallback Path
 **Goal**: Performer can mirror the same current instrument state to a phone over a simple local browser path without losing the laptop as the trusted fallback display.
@@ -56,6 +61,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Truthful Laptop Display | 0/TBD | Not started | - |
+| 1. Truthful Laptop Display | 1/4 | In Progress | 2026-03-07 |
 | 2. Phone Mirror and Fallback Path | 0/TBD | Not started | - |
 | 3. Performer Context and Rig Profiles | 0/TBD | Not started | - |

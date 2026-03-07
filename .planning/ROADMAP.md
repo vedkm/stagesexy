@@ -34,7 +34,7 @@ Plans:
 - [x] `01-03-PLAN.md` - Build the fullscreen laptop stage UI against mocked snapshot contracts
 - [x] `01-04-PLAN.md` - Integrate the companion truth pipeline, alias persistence, and live laptop display
 - [x] `01-05-PLAN.md` - Make the Bitwig-to-companion transport and companion runtime path real instead of test-only
-- [ ] `01-06-PLAN.md` - Expose alias management through a public companion command
+- [x] `01-06-PLAN.md` - Expose alias management through a public companion command
 - [ ] `01-07-PLAN.md` - Rehearse the full truthful laptop path with real Bitwig switching and public alias writes
 
 ### Phase 2: Phone Mirror and Fallback Path
@@ -64,6 +64,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Truthful Laptop Display | 5/7 | In Progress | - |
+| 1. Truthful Laptop Display | 6/7 | In Progress | - |
 | 2. Phone Mirror and Fallback Path | 0/TBD | Not started | - |
 | 3. Performer Context and Rig Profiles | 0/TBD | Not started | - |

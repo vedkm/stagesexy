@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-03-07T14:54:00.205Z"
-last_activity: 2026-03-07 - Completed Plan 01-05 real Bitwig ingest transport and companion runtime entrypoint
+stopped_at: Completed 01-06-PLAN.md
+last_updated: "2026-03-07T14:59:13Z"
+last_activity: 2026-03-07 - Completed Plan 01-06 public alias command and server-owned snapshot proof
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -21,36 +21,36 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-03-07)
 
 **Core value:** When the performer changes instruments in Bitwig, the current instrument name is shown immediately and clearly enough to trust on stage without relying on the normal Bitwig UI.
-**Current focus:** Phase 1 - close the remaining alias-management and human-rehearsal gaps for the truthful laptop display
+**Current focus:** Phase 1 - finish the final human rehearsal now that alias writes are publicly surfaced
 
 ## Current Position
 
 Phase: 1 of 3 (Truthful Laptop Display)
-Plan: 5 of 7 in current phase
+Plan: 6 of 7 in current phase
 Status: In Progress
-Last activity: 2026-03-07 - Completed Plan 01-05 real Bitwig ingest transport and companion runtime entrypoint
+Last activity: 2026-03-07 - Completed Plan 01-06 public alias command and server-owned snapshot proof
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 86%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 9 min
-- Total execution time: 0.7 hours
+- Total plans completed: 6
+- Average duration: 8 min
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 5 | 43 | 9 min |
+| 1 | 6 | 45 | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-03 (2 min), 01-02 (15 min), 01-04 (13 min), 01-05 (9 min)
+- Last 5 plans: 01-02 (15 min), 01-03 (2 min), 01-04 (13 min), 01-05 (9 min), 01-06 (2 min)
 - Trend: Stable
-| Phase 01 P02 | 15 min | 2 tasks | 10 files |
 | Phase 01 P04 | 13 min | 2 tasks | 16 files |
 | Phase 01 P05 | 9 min | 2 tasks | 9 files |
+| Phase 01 P06 | 2 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -75,10 +75,10 @@ Recent decisions affecting current work:
 - [Plan 01-05]: Post normalized Bitwig events to `http://127.0.0.1:3197/ingest` so the source bridge and companion share one production transport path.
 - [Plan 01-05]: Start the companion truth service through `npm run start:server`, with env overrides for rehearsal and automated smoke coverage.
 - [Plan 01-05]: Verify the laptop browser path by spawning the real companion runtime command instead of constructing the Fastify app directly in Playwright.
+- [Plan 01-06]: Surface alias writes through `npm --prefix companion run alias:set -- --layer-key <value> --stage-label <value>` so performers can update persisted labels without editing internals.
 
 ### Pending Todos
 
-- Execute `01-06` to expose alias writes through a public companion command.
 - Execute `01-07` for human rehearsal against the real Bitwig -> companion -> laptop path.
 
 ### Blockers/Concerns
@@ -89,6 +89,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-07T14:54:00.203Z
-Stopped at: Completed 01-05-PLAN.md
+Last session: 2026-03-07T14:59:13Z
+Stopped at: Completed 01-06-PLAN.md
 Resume file: None

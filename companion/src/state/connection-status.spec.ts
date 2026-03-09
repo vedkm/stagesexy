@@ -11,6 +11,14 @@ const baseSnapshot: StageSnapshot = {
   layerKey: "main-selector:1",
   rawName: "Warm Pad",
   displayLabel: "Warm Pad",
+  layers: [
+    {
+      layerKey: "main-selector:1",
+      rawName: "Warm Pad",
+      displayLabel: "Warm Pad",
+      isActive: true,
+    },
+  ],
   status: "live",
   sequence: 9,
   occurredAt: "2026-03-07T12:00:00.000Z",

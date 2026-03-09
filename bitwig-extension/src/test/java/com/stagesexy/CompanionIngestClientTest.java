@@ -51,6 +51,10 @@ class CompanionIngestClientTest {
                     3,
                     "Lead Piano",
                     null,
+                    java.util.List.of(
+                        new NormalizedInstrumentPublisher.ObservedLayer(2, "Warm Pad", null),
+                        new NormalizedInstrumentPublisher.ObservedLayer(3, "Lead Piano", null)
+                    ),
                     NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
                 )
             ).payload();

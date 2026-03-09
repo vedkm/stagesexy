@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import type { StageSnapshot } from "../types/stage";
+import type { StageLayer, StageSnapshot } from "../types/stage";
 
 const COMPANION_ORIGIN =
   import.meta.env.VITE_COMPANION_ORIGIN ?? "http://127.0.0.1:3197";
@@ -13,6 +13,7 @@ const DISCONNECTED_SNAPSHOT: StageSnapshot = {
   layerKey: null,
   rawName: null,
   displayLabel: DEFAULT_STAGE_LABEL,
+  layers: [],
   status: "disconnected",
   sequence: 0,
   occurredAt: null,
@@ -105,7 +106,8 @@ function parseStageSnapshot(value: unknown): StageSnapshot | null {
     typeof candidate.selectorName !== "string" ||
     typeof candidate.displayLabel !== "string" ||
     typeof candidate.sequence !== "number" ||
-    !isConnectionStatus(candidate.status)
+    !isConnectionStatus(candidate.status) ||
+    !isStageLayers(candidate.layers)
   ) {
     return null;
   }
@@ -143,11 +145,25 @@ function parseStageSnapshot(value: unknown): StageSnapshot | null {
     layerKey: candidate.layerKey ?? null,
     rawName: candidate.rawName ?? null,
     displayLabel: candidate.displayLabel,
+    layers: candidate.layers,
     status: candidate.status,
     sequence: candidate.sequence,
     occurredAt: candidate.occurredAt ?? null,
     updatedAt: candidate.updatedAt ?? null,
   };
+}
+
+function isStageLayers(value: StageSnapshot["layers"] | undefined): value is StageLayer[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (layer) =>
+        typeof layer.layerKey === "string" &&
+        typeof layer.rawName === "string" &&
+        typeof layer.displayLabel === "string" &&
+        typeof layer.isActive === "boolean",
+    )
+  );
 }
 
 function isConnectionStatus(

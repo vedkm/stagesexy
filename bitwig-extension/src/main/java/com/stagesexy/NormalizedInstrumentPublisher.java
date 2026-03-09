@@ -2,6 +2,7 @@ package com.stagesexy;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -50,12 +51,19 @@ public final class NormalizedInstrumentPublisher {
         final String layerKey = stableLayerId != null
             ? stableLayerId
             : fallbackLayerKey(selectorIdentity, observation.layerIndex());
+        final List<SelectorLayer> layers = normalizeLayers(
+            selectorIdentity,
+            layerKey,
+            rawName,
+            observation.layers()
+        );
 
         final NormalizedInstrumentEvent event = new NormalizedInstrumentEvent(
             "bitwig",
             selectorName,
             layerKey,
             rawName,
+            layers,
             nextSequence++,
             occurredAt.toString()
         );
@@ -77,9 +85,67 @@ public final class NormalizedInstrumentPublisher {
             + "\"selectorName\":\"" + escapeJson(event.selectorName()) + "\","
             + "\"layerKey\":\"" + escapeJson(event.layerKey()) + "\","
             + "\"rawName\":\"" + escapeJson(event.rawName()) + "\","
+            + "\"layers\":" + layersToJson(event.layers()) + ","
             + "\"sequence\":" + event.sequence() + ","
             + "\"occurredAt\":\"" + escapeJson(event.occurredAt()) + "\""
             + "}";
+    }
+
+    private static List<SelectorLayer> normalizeLayers(
+        final String selectorIdentity,
+        final String activeLayerKey,
+        final String activeRawName,
+        final List<ObservedLayer> observedLayers
+    ) {
+        final List<ObservedLayer> layers = observedLayers == null ? List.of() : observedLayers;
+        final List<SelectorLayer> normalizedLayers = new java.util.ArrayList<>();
+
+        for (final ObservedLayer layer : layers) {
+            if (layer == null) {
+                continue;
+            }
+
+            final String rawName = trimToNull(layer.rawName());
+            if (rawName == null) {
+                continue;
+            }
+
+            final String stableLayerId = trimToNull(layer.stableLayerId());
+            final String layerKey = stableLayerId != null
+                ? stableLayerId
+                : fallbackLayerKey(selectorIdentity, layer.layerIndex());
+
+            normalizedLayers.add(new SelectorLayer(layerKey, rawName));
+        }
+
+        final boolean hasActiveLayer = normalizedLayers.stream()
+            .anyMatch(layer -> layer.layerKey().equals(activeLayerKey));
+
+        if (!hasActiveLayer) {
+            normalizedLayers.add(new SelectorLayer(activeLayerKey, activeRawName));
+        }
+
+        return List.copyOf(normalizedLayers);
+    }
+
+    private static String layersToJson(final List<SelectorLayer> layers) {
+        final StringBuilder json = new StringBuilder("[");
+
+        for (int index = 0; index < layers.size(); index++) {
+            final SelectorLayer layer = layers.get(index);
+
+            if (index > 0) {
+                json.append(",");
+            }
+
+            json.append("{")
+                .append("\"layerKey\":\"").append(escapeJson(layer.layerKey())).append("\",")
+                .append("\"rawName\":\"").append(escapeJson(layer.rawName())).append("\"")
+                .append("}");
+        }
+
+        json.append("]");
+        return json.toString();
     }
 
     private static String requireText(final String value, final String fieldName) {
@@ -116,6 +182,7 @@ public final class NormalizedInstrumentPublisher {
         int layerIndex,
         String rawName,
         String stableLayerId,
+        List<ObservedLayer> layers,
         ObservationSignal signal
     ) {
     }
@@ -125,8 +192,22 @@ public final class NormalizedInstrumentPublisher {
         String selectorName,
         String layerKey,
         String rawName,
+        List<SelectorLayer> layers,
         int sequence,
         String occurredAt
+    ) {
+    }
+
+    public record ObservedLayer(
+        int layerIndex,
+        String rawName,
+        String stableLayerId
+    ) {
+    }
+
+    public record SelectorLayer(
+        String layerKey,
+        String rawName
     ) {
     }
 

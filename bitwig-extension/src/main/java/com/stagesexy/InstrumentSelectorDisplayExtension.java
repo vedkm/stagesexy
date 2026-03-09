@@ -218,6 +218,29 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
                 return;
             }
 
+            final List<NormalizedInstrumentPublisher.ObservedLayer> selectorLayers = new ArrayList<>();
+            for (final ObservedLayer observedLayer : observedLayers) {
+                if (!observedLayer.exists()) {
+                    continue;
+                }
+
+                final String trimmedLayerName = observedLayer.name() == null
+                    ? ""
+                    : observedLayer.name().trim();
+
+                if (trimmedLayerName.isEmpty()) {
+                    continue;
+                }
+
+                selectorLayers.add(
+                    new NormalizedInstrumentPublisher.ObservedLayer(
+                        observedLayer.index(),
+                        trimmedLayerName,
+                        null
+                    )
+                );
+            }
+
             publisher.publish(
                 new NormalizedInstrumentPublisher.SelectorObservation(
                     FALLBACK_SELECTOR_IDENTITY,
@@ -225,6 +248,7 @@ public class InstrumentSelectorDisplayExtension extends ControllerExtensionDefin
                     activeChainIndex,
                     trimmedChainName,
                     null,
+                    selectorLayers,
                     NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
                 )
             );

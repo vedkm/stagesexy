@@ -52,6 +52,27 @@ function isNormalizedInstrumentEvent(
     typeof candidate.sequence === "number" &&
     Number.isFinite(candidate.sequence) &&
     typeof candidate.occurredAt === "string" &&
-    candidate.occurredAt.trim().length > 0
+    candidate.occurredAt.trim().length > 0 &&
+    isSelectorLayers(candidate.layers)
+  );
+}
+
+function isSelectorLayers(
+  value: NormalizedInstrumentEvent["layers"] | undefined,
+): boolean {
+  if (value === undefined) {
+    return true;
+  }
+
+  if (!Array.isArray(value)) {
+    return false;
+  }
+
+  return value.every(
+    (layer) =>
+      typeof layer.layerKey === "string" &&
+      layer.layerKey.trim().length > 0 &&
+      typeof layer.rawName === "string" &&
+      layer.rawName.trim().length > 0,
   );
 }

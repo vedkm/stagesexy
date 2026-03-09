@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { ReactElement } from "react";
 
-import type { StageSnapshot } from "../types/stage";
+import type { StageLayer, StageSnapshot } from "../types/stage";
 import "./stage-display.css";
 
 export interface StageDisplayProps {
@@ -35,6 +35,14 @@ interface FamilyMatch {
 
 export function StageDisplay({ snapshot }: StageDisplayProps) {
   const familyMatch = useMemo(() => resolveFamilyMatch(snapshot), [snapshot]);
+  const orderedLayers = useMemo(
+    () =>
+      snapshot.layers.map((layer) => ({
+        ...layer,
+        familyMatch: resolveFamilyMatch(layer),
+      })),
+    [snapshot.layers],
+  );
 
   return (
     <section
@@ -80,16 +88,64 @@ export function StageDisplay({ snapshot }: StageDisplayProps) {
             {STATUS_COPY[snapshot.status]}
           </p>
         </div>
+        <aside className="stage-display__stack" aria-label="Selector stack">
+          <div className="stage-display__stack-header">
+            <p className="stage-display__stack-eyebrow">Selector stack</p>
+            <p className="stage-display__stack-count">
+              {orderedLayers.length} layers
+            </p>
+          </div>
+          <div className="stage-display__stack-list">
+            {orderedLayers.map((layer, index) => (
+              <StackLayerRow key={layer.layerKey} index={index} layer={layer} />
+            ))}
+          </div>
+        </aside>
       </div>
     </section>
   );
 }
 
-function resolveFamilyMatch(snapshot: StageSnapshot): FamilyMatch {
+function StackLayerRow({
+  index,
+  layer,
+}: {
+  index: number;
+  layer: StageLayer & { familyMatch: FamilyMatch };
+}): ReactElement {
+  return (
+    <article
+      className="stage-display__stack-item"
+      data-active={layer.isActive ? "true" : "false"}
+    >
+      <p className="stage-display__stack-index" aria-hidden="true">
+        {String(index + 1).padStart(2, "0")}
+      </p>
+      <div className="stage-display__stack-copy">
+        <p className="stage-display__stack-name">{layer.displayLabel}</p>
+        <p className="stage-display__stack-meta">
+          <span className="stage-display__stack-family-icon" aria-hidden="true">
+            <StageIcon family={layer.familyMatch.family} />
+          </span>
+          <span>{layer.familyMatch.label}</span>
+          {layer.isActive ? (
+            <span className="stage-display__stack-active-copy">Current</span>
+          ) : null}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function resolveFamilyMatch(value: {
+  displayLabel: string;
+  rawName: string | null;
+  selectorName?: string;
+}): FamilyMatch {
   const haystack = [
-    snapshot.displayLabel,
-    snapshot.rawName ?? "",
-    snapshot.selectorName,
+    value.displayLabel,
+    value.rawName ?? "",
+    value.selectorName ?? "",
   ]
     .join(" ")
     .toLowerCase();

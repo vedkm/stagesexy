@@ -4,7 +4,12 @@ import {
   type FreshnessThresholds,
   resolveConnectionStatus,
 } from "./connection-status";
-import type { NormalizedInstrumentEvent, StageSnapshot } from "../types/stage";
+import type {
+  NormalizedInstrumentEvent,
+  SelectorLayer,
+  StageLayer,
+  StageSnapshot,
+} from "../types/stage";
 
 export interface SnapshotOptions {
   now?: Date;
@@ -67,11 +72,13 @@ function buildSnapshot(
       resolveStageLabel(layerKey, rawName, []));
 
   const updatedAt = event.occurredAt;
+  const layers = buildStageLayers(event, resolveLabel);
   const snapshot: StageSnapshot = {
     selectorName: event.selectorName,
     layerKey: event.layerKey,
     rawName: event.rawName,
     displayLabel: resolveLabel(event.layerKey, event.rawName),
+    layers,
     status: "live",
     sequence: event.sequence,
     occurredAt: event.occurredAt,
@@ -90,9 +97,55 @@ function createDisconnectedSnapshot(): StageSnapshot {
     layerKey: null,
     rawName: null,
     displayLabel: "Waiting for instrument data",
+    layers: [],
     status: "disconnected",
     sequence: 0,
     occurredAt: null,
     updatedAt: null,
   };
+}
+
+function buildStageLayers(
+  event: NormalizedInstrumentEvent,
+  resolveLabel: (layerKey: string | null, rawName: string | null) => string,
+): StageLayer[] {
+  return normalizeEventLayers(event).map((layer) => ({
+    ...layer,
+    displayLabel: resolveLabel(layer.layerKey, layer.rawName),
+    isActive: layer.layerKey === event.layerKey,
+  }));
+}
+
+function normalizeEventLayers(event: NormalizedInstrumentEvent): SelectorLayer[] {
+  const candidateLayers =
+    event.layers && event.layers.length > 0
+      ? event.layers
+      : [{ layerKey: event.layerKey, rawName: event.rawName }];
+
+  const uniqueLayers = new Map<string, SelectorLayer>();
+
+  for (const layer of candidateLayers) {
+    if (
+      typeof layer.layerKey !== "string" ||
+      layer.layerKey.trim().length === 0 ||
+      typeof layer.rawName !== "string" ||
+      layer.rawName.trim().length === 0
+    ) {
+      continue;
+    }
+
+    uniqueLayers.set(layer.layerKey.trim(), {
+      layerKey: layer.layerKey.trim(),
+      rawName: layer.rawName.trim(),
+    });
+  }
+
+  if (!uniqueLayers.has(event.layerKey)) {
+    uniqueLayers.set(event.layerKey, {
+      layerKey: event.layerKey,
+      rawName: event.rawName,
+    });
+  }
+
+  return [...uniqueLayers.values()];
 }

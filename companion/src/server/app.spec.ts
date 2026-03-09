@@ -14,6 +14,11 @@ const BASE_EVENT: NormalizedInstrumentEvent = {
   selectorName: "Main Selector",
   layerKey: "main-selector:1",
   rawName: "Concert Grand",
+  layers: [
+    { layerKey: "main-selector:0", rawName: "Warm Pad" },
+    { layerKey: "main-selector:1", rawName: "Concert Grand" },
+    { layerKey: "main-selector:2", rawName: "Noise Lead" },
+  ],
   sequence: 7,
   occurredAt: "2026-03-07T12:00:00.000Z",
 };
@@ -59,6 +64,26 @@ describe("buildCompanionApp", () => {
       expect(snapshotResponse.json()).toMatchObject({
         displayLabel: "Piano Intro",
         rawName: "Concert Grand",
+        layers: [
+          {
+            layerKey: "main-selector:0",
+            rawName: "Warm Pad",
+            displayLabel: "Warm Pad",
+            isActive: false,
+          },
+          {
+            layerKey: "main-selector:1",
+            rawName: "Concert Grand",
+            displayLabel: "Piano Intro",
+            isActive: true,
+          },
+          {
+            layerKey: "main-selector:2",
+            rawName: "Noise Lead",
+            displayLabel: "Noise Lead",
+            isActive: false,
+          },
+        ],
       });
     } finally {
       await app.close();
@@ -94,6 +119,26 @@ describe("buildCompanionApp", () => {
         layerKey: "main-selector:1",
         rawName: "Concert Grand",
         displayLabel: "Piano Intro",
+        layers: [
+          {
+            layerKey: "main-selector:0",
+            rawName: "Warm Pad",
+            displayLabel: "Warm Pad",
+            isActive: false,
+          },
+          {
+            layerKey: "main-selector:1",
+            rawName: "Concert Grand",
+            displayLabel: "Piano Intro",
+            isActive: true,
+          },
+          {
+            layerKey: "main-selector:2",
+            rawName: "Noise Lead",
+            displayLabel: "Noise Lead",
+            isActive: false,
+          },
+        ],
         status: "live",
         sequence: 7,
         occurredAt: "2026-03-07T12:00:00.000Z",

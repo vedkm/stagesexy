@@ -28,16 +28,24 @@ class NormalizedInstrumentPublisherTest {
                 2,
                 "Lead Piano",
                 null,
+                List.of(
+                    new NormalizedInstrumentPublisher.ObservedLayer(0, "Piano Intro", null),
+                    new NormalizedInstrumentPublisher.ObservedLayer(1, "Warm Pad", null),
+                    new NormalizedInstrumentPublisher.ObservedLayer(2, "Lead Piano", null)
+                ),
                 NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
             )
         );
 
         assertEquals("bitwig", published.event().source());
         assertEquals("selected-track:first-instrument:2", published.event().layerKey());
+        assertEquals(3, published.event().layers().size());
+        assertEquals("selected-track:first-instrument:0", published.event().layers().get(0).layerKey());
         assertEquals(1, published.event().sequence());
         assertEquals("2026-03-07T16:00:00Z", published.event().occurredAt());
         assertEquals(1, payloads.size());
         assertTrue(payloads.get(0).contains("\"layerKey\":\"selected-track:first-instrument:2\""));
+        assertTrue(payloads.get(0).contains("\"layers\":["));
     }
 
     @Test
@@ -55,6 +63,9 @@ class NormalizedInstrumentPublisherTest {
                 1,
                 "Pad",
                 "bitwig-layer-42",
+                List.of(
+                    new NormalizedInstrumentPublisher.ObservedLayer(1, "Pad", "bitwig-layer-42")
+                ),
                 NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
             )
         );
@@ -79,6 +90,7 @@ class NormalizedInstrumentPublisherTest {
                     1,
                     "Pad",
                     null,
+                    List.of(),
                     NormalizedInstrumentPublisher.ObservationSignal.UI_FOCUS
                 )
             )
@@ -105,6 +117,9 @@ class NormalizedInstrumentPublisherTest {
                 0,
                 "Keys",
                 null,
+                List.of(
+                    new NormalizedInstrumentPublisher.ObservedLayer(0, "Keys", null)
+                ),
                 NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
             )
         ).event().sequence();
@@ -116,6 +131,10 @@ class NormalizedInstrumentPublisherTest {
                 1,
                 "Bass",
                 null,
+                List.of(
+                    new NormalizedInstrumentPublisher.ObservedLayer(0, "Keys", null),
+                    new NormalizedInstrumentPublisher.ObservedLayer(1, "Bass", null)
+                ),
                 NormalizedInstrumentPublisher.ObservationSignal.LAYER_ACTIVATION
             )
         ).event().sequence();

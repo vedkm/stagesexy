@@ -11,6 +11,11 @@ describe("createStageStore", () => {
       selectorName: "Main Selector",
       layerKey: "main-selector:2",
       rawName: "Raw Lead",
+      layers: [
+        { layerKey: "main-selector:0", rawName: "Piano Intro" },
+        { layerKey: "main-selector:1", rawName: "Warm Pad" },
+        { layerKey: "main-selector:2", rawName: "Raw Lead" },
+      ],
       sequence: 12,
       occurredAt: "2026-03-07T12:00:00.000Z",
     };
@@ -22,6 +27,26 @@ describe("createStageStore", () => {
       layerKey: "main-selector:2",
       rawName: "Raw Lead",
       displayLabel: "Raw Lead",
+      layers: [
+        {
+          layerKey: "main-selector:0",
+          rawName: "Piano Intro",
+          displayLabel: "Piano Intro",
+          isActive: false,
+        },
+        {
+          layerKey: "main-selector:1",
+          rawName: "Warm Pad",
+          displayLabel: "Warm Pad",
+          isActive: false,
+        },
+        {
+          layerKey: "main-selector:2",
+          rawName: "Raw Lead",
+          displayLabel: "Raw Lead",
+          isActive: true,
+        },
+      ],
       status: "live",
       sequence: 12,
       occurredAt: "2026-03-07T12:00:00.000Z",
